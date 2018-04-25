@@ -44,9 +44,12 @@ while True:
      tags["pgids.real"] = int(proc.info["gids"].real)
      tags["pgids.effective"] = int(proc.info["gids"].effective)
      tags["pgids.saved"] = int(proc.info["gids"].saved)
-     tags["pid"] = int(proc.info["pid"])
-     tags["ppid"] = int(proc.info["ppid"])
-     tags["name"] = proc.info["name"]
+     tags["pid"] = proc.pid
+     tags["ppid"] = proc.ppid()
+     tags["name"] = proc.name()
+     tags["exe"] = proc.exe()
+     tags["cwd"] = proc.cwd()
+     tags["cmdline"] = " ".join(proc.cmdline())
      tags["hostname"] = hostname
 
      del fields["memory_info"]

@@ -146,12 +146,14 @@ $ sudo docker run -p -d --restart always --name influx 8086:8086 \
 # open console to db (other terminal)
 $ sudo docker run -it --rm --link influx influxdb influx -host influx
 
+# RUN AS root to see full process information
+$ su
 # create envars
-$ export INFLUX_HOST=localhost
-$ export INFLUX_PORT=8086
-$ export INFLUX_USER=dummy
-$ export INFLUX_PASSWORD=dummy
-$ export INFLUX_DB=psstat
-$ ./monitor_processes.py [DELAY in secs, default 15 secs]
+(root) $ export INFLUX_HOST=localhost
+(root) $ export INFLUX_PORT=8086
+(root) $ export INFLUX_USER=dummy
+(root) $ export INFLUX_PASSWORD=dummy
+(root) $ export INFLUX_DB=psstat
+(root) $ ./monitor_processes.py [DELAY in secs, default 15 secs]
 
 ```
