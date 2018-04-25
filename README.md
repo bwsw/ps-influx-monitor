@@ -128,24 +128,34 @@ Example Grafana Panel JSON which enables monitoring of RAM usage for every syste
 $ /usr/bin/env python3 -m pip install --user --upgrade pip && /usr/bin/env python3 -m pip install --user -r requirements.txt
 ```
 
-### Install influx with docker
+### Install influx with docker and create a configuration file
 
 ```bash
-
 $ mkdir -p tmp/{config,data}
-
 # generate config (don't forget to change it next if necessary)
 $ sudo docker run --rm influxdb influxd config > tmp/config/influxdb.conf
+```
 
-# run server
+### Run influxdb server
+
+```bash
 $ sudo docker run -p -d --restart always --name influx 8086:8086 \
       -v $PWD/tmp/config:/etc/influxdb:ro \
       -v $PWD/tmp/data:/var/lib/influxdb \
       influxdb -config /etc/influxdb/influxdb.conf
+```
 
-# open console to db (other terminal)
+### Open a console to db (other terminal) and create a database where data will be stored
+
+```baseh
 $ sudo docker run -it --rm --link influx influxdb influx -host influx
+> create database psstat
+> exit
+```
 
+### Launch monitoring
+
+```bash
 # RUN AS root to see full process information
 $ su
 # create envars
@@ -155,5 +165,4 @@ $ su
 (root) $ export INFLUX_PASSWORD=dummy
 (root) $ export INFLUX_DB=psstat
 (root) $ ./monitor_processes.py [DELAY in secs, default 15 secs]
-
 ```
