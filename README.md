@@ -60,7 +60,7 @@ Example Grafana Panel JSON which enables monitoring of RAM usage for every syste
       ],
       "measurement": "ps",
       "policy": "default",
-      "query": "SELECT sum(\"pmem.rss\")/8 FROM \"ps\" WHERE $timeFilter GROUP BY time($interval), \"puids.effective\" fill(null)",
+      "query": "SELECT sum(\"pmem.rss\")/8 FROM \"psstat\" WHERE $timeFilter GROUP BY time($interval), \"puids.effective\" fill(null)",
       "rawQuery": true,
       "refId": "A",
       "resultFormat": "time_series",
