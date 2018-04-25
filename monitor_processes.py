@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 
 import psutil
 import os
@@ -17,50 +17,47 @@ influxClient = InfluxDBClient(influxHost, influxPort, influxUser, influxPassword
 hostname = socket.gethostname()
 
 while True:
-	time.sleep(15)
-	influxPushRecord = []
-	for proc in psutil.process_iter(attrs = ['pid','name', 'cpu_times', 'memory_info', 'gids', 'uids','ppid']):
-		fields = proc.info
-		tags = {}
-		fields["pcpu.user"] = proc.info["cpu_times"].user
-		fields["pcpu.system"] = proc.info["cpu_times"].system
-		fields["pcpu.children_user"] = proc.info["cpu_times"].children_user
-		fields["pcpu.children_system"] = proc.info["cpu_times"].children_system
-        	fields["pmem.rss"] = proc.info["memory_info"].rss
-        	fields["pmem.vms"] = proc.info["memory_info"].vms
-        	fields["pmem.shared"] = proc.info["memory_info"].shared
-        	fields["pmem.lib"] = proc.info["memory_info"].lib
-        	fields["pmem.data"] = proc.info["memory_info"].data
-        	fields["pmem.dirty"] = proc.info["memory_info"].dirty
+   time.sleep(15)
+   influxPushRecord = []
+   for proc in psutil.process_iter(attrs = ['pid','name', 'cpu_times', 'memory_info', 'gids', 'uids','ppid']):
+     fields = proc.info
+     tags = {}
+     fields["pcpu.user"] = proc.info["cpu_times"].user
+     fields["pcpu.system"] = proc.info["cpu_times"].system
+     fields["pcpu.children_user"] = proc.info["cpu_times"].children_user
+     fields["pcpu.children_system"] = proc.info["cpu_times"].children_system
+     fields["pmem.rss"] = proc.info["memory_info"].rss
+     fields["pmem.vms"] = proc.info["memory_info"].vms
+     fields["pmem.shared"] = proc.info["memory_info"].shared
+     fields["pmem.lib"] = proc.info["memory_info"].lib
+     fields["pmem.data"] = proc.info["memory_info"].data
+     fields["pmem.dirty"] = proc.info["memory_info"].dirty
 
-		tags["puids.real"] = proc.info["uids"].real
-		tags["puids.effective"] = proc.info["uids"].effective
-		tags["puids.saved"] = proc.info["uids"].saved
-        	tags["pgids.real"] = proc.info["gids"].real
-        	tags["pgids.effective"] = proc.info["gids"].effective
-        	tags["pgids.saved"] = proc.info["gids"].saved
-		tags["pid"] = proc.info["pid"]
-		tags["ppid"] = proc.info["ppid"]
-		tags["name"] = proc.info["name"]
-		tags["hostname"] = hostname
+     tags["puids.real"] = proc.info["uids"].real
+     tags["puids.effective"] = proc.info["uids"].effective
+     tags["puids.saved"] = proc.info["uids"].saved
+     tags["pgids.real"] = proc.info["gids"].real
+     tags["pgids.effective"] = proc.info["gids"].effective
+     tags["pgids.saved"] = proc.info["gids"].saved
+     tags["pid"] = proc.info["pid"]
+     tags["ppid"] = proc.info["ppid"]
+     tags["name"] = proc.info["name"]
+     tags["hostname"] = hostname
 
-		del fields["memory_info"]
-		del fields["cpu_times"]
-        	del fields["uids"]
-        	del fields["gids"]
-        	del fields["pid"]
-        	del fields["ppid"]
-        	del fields["name"]
+     del fields["memory_info"]
+     del fields["cpu_times"]
+     del fields["uids"]
+     del fields["gids"]
+     del fields["pid"]
+     del fields["ppid"]
+     del fields["name"]
 
+     influxRecord = {
+       "fields": fields,
+       "tags": tags,
+       "measurement": influxDB
+     }
+     influxPushRecord.append(influxRecord)
 
-		influxRecord = {
-			"fields": fields,
-			"tags": tags,
-			"measurement": influxDB
-		}
+   influxClient.write_points(influxPushRecord)	
 
-		influxPushRecord.append(influxRecord)
-
-	influxClient.write_points(influxPushRecord)	
-
-# pp(influx_push_record)
