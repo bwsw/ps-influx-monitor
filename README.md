@@ -152,6 +152,6 @@ $ export INFLUX_PORT=8086
 $ export INFLUX_USER=dummy
 $ export INFLUX_PASSWORD=dummy
 $ export INFLUX_DB=psstat
-$ ./monitor_processes.py
+$ ./monitor_processes.py [DELAY in secs, default 15 secs]
 
 ```

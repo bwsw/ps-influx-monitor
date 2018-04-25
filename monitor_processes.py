@@ -2,6 +2,7 @@
 
 import psutil
 import os
+import sys
 import time
 from influxdb import InfluxDBClient
 import socket
@@ -16,31 +17,35 @@ influxClient = InfluxDBClient(influxHost, influxPort, influxUser, influxPassword
 
 hostname = socket.gethostname()
 
+sleep_time = 15
+if len(sys.argv) > 1:
+   sleep_time = int(sys.argv[1])
+
 while True:
-   time.sleep(15)
+   time.sleep(sleep_time)
    influxPushRecord = []
    for proc in psutil.process_iter(attrs = ['pid','name', 'cpu_times', 'memory_info', 'gids', 'uids','ppid']):
      fields = proc.info
      tags = {}
-     fields["pcpu.user"] = proc.info["cpu_times"].user
-     fields["pcpu.system"] = proc.info["cpu_times"].system
-     fields["pcpu.children_user"] = proc.info["cpu_times"].children_user
-     fields["pcpu.children_system"] = proc.info["cpu_times"].children_system
-     fields["pmem.rss"] = proc.info["memory_info"].rss
-     fields["pmem.vms"] = proc.info["memory_info"].vms
-     fields["pmem.shared"] = proc.info["memory_info"].shared
-     fields["pmem.lib"] = proc.info["memory_info"].lib
-     fields["pmem.data"] = proc.info["memory_info"].data
-     fields["pmem.dirty"] = proc.info["memory_info"].dirty
+     fields["pcpu.user"] = float(proc.info["cpu_times"].user)
+     fields["pcpu.system"] = float(proc.info["cpu_times"].system)
+     fields["pcpu.children_user"] = float(proc.info["cpu_times"].children_user)
+     fields["pcpu.children_system"] = float(proc.info["cpu_times"].children_system)
+     fields["pmem.rss"] = float(proc.info["memory_info"].rss)
+     fields["pmem.vms"] = float(proc.info["memory_info"].vms)
+     fields["pmem.shared"] = float(proc.info["memory_info"].shared)
+     fields["pmem.lib"] = float(proc.info["memory_info"].lib)
+     fields["pmem.data"] = float(proc.info["memory_info"].data)
+     fields["pmem.dirty"] = float(proc.info["memory_info"].dirty)
 
-     tags["puids.real"] = proc.info["uids"].real
-     tags["puids.effective"] = proc.info["uids"].effective
-     tags["puids.saved"] = proc.info["uids"].saved
-     tags["pgids.real"] = proc.info["gids"].real
-     tags["pgids.effective"] = proc.info["gids"].effective
-     tags["pgids.saved"] = proc.info["gids"].saved
-     tags["pid"] = proc.info["pid"]
-     tags["ppid"] = proc.info["ppid"]
+     tags["puids.real"] = int(proc.info["uids"].real)
+     tags["puids.effective"] = int(proc.info["uids"].effective)
+     tags["puids.saved"] = int(proc.info["uids"].saved)
+     tags["pgids.real"] = int(proc.info["gids"].real)
+     tags["pgids.effective"] = int(proc.info["gids"].effective)
+     tags["pgids.saved"] = int(proc.info["gids"].saved)
+     tags["pid"] = int(proc.info["pid"])
+     tags["ppid"] = int(proc.info["ppid"])
      tags["name"] = proc.info["name"]
      tags["hostname"] = hostname
 
